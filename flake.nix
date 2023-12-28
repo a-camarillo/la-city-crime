@@ -14,9 +14,7 @@
             packages = [
               pkgs.postgresql
               (pkgs.python311.withPackages(ps:[
-                ps.pandas
                 ps.psycopg
-                ps.tabulate
               ]))
             ];
           };
