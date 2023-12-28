@@ -1,0 +1,15 @@
+services:
+  db:
+    container_name: pgdb
+    image: postgres
+    user: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=la-crime
+      - POSTGRES_PASSWORD=test
+    healthcheck:
+      test: [ "CMD", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
