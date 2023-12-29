@@ -8,17 +8,30 @@
       systems = [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" "x86_64-darwin" ];
 
       perSystem = { config, self', inputs', pkgs, system, ... }:
-      {
-        devShells = {
-          default = pkgs.mkShell {
-            packages = [
-              pkgs.postgresql
-              (pkgs.python311.withPackages(ps:[
-                ps.psycopg
-              ]))
-            ];
+        let
+          name = "api";
+          vendorHash = null;
+        in
+        {
+          devShells = {
+            data = pkgs.mkShell {
+              packages = [
+                pkgs.postgresql
+                (pkgs.python311.withPackages(ps:[
+                  ps.psycopg
+                ]))
+              ];
+            };
+            api = pkgs.mkShell {
+              inputsFrom = [ self'.packages.api ];
+            };
+          };
+          packages = {
+            api = pkgs.buildGoModule {
+              inherit name vendorHash;
+              src = "./api/";
+            };
           };
         };
-      };
-    };
+  };
 }
