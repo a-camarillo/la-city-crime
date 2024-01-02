@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -8,10 +9,19 @@ import (
 )
 
 func main() {
+
+	service, err := NewPostgresService()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	r := chi.NewRouter()
-	r.Use(middleware.Logger)
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("welcome"))
+
+	server := NewServer(":3000", *service, *r)
+
+	server.Router.Use(middleware.Logger)
+	server.Router.Route("/crimeInfo", func(r chi.Router) {
+		r.Get("/", HandleFuncCreator(server.listCrimeInfo))
 	})
-	http.ListenAndServe(":3000", r)
+	http.ListenAndServe(":3000", &server.Router)
 }

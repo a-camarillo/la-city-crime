@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"database/sql"
-	"log"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -13,14 +12,14 @@ type postgresService struct {
 	db *sql.DB
 }
 
-func (d *postgresService) NewPostgresService() *postgresService {
-	db, err := sql.Open("postgres", "database=la-crime")
+func NewPostgresService() (*postgresService, error) {
+	db, err := sql.Open("postgres", "database=la-crime user=postgres sslmode=disable port=5432 password=test")
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	return &postgresService{
 		db: db,
-	}
+	}, nil
 }
 
 func (d *postgresService) QueryCrimeInfo(ctx context.Context) ([]CrimeInfo, error) {
