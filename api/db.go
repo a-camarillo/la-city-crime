@@ -62,3 +62,44 @@ func (d *postgresService) QueryCrimeInfo(ctx context.Context) ([]CrimeInfo, erro
 	}
 	return crimeInfo, nil
 }
+
+func (d *postgresService) QueryCrimeInfoByDate(ctx context.Context, date string) ([]CrimeInfo, error) {
+	crimeInfo := []CrimeInfo{}
+	rows, err := d.db.QueryContext(ctx,
+		`
+  SELECT * FROM crimeInfo
+  WHERE dateOccurred = $1
+  `, date)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var (
+			id           int
+			dateReported time.Time
+			dateOccurred time.Time
+			timeOccurred time.Time
+			locationID   int
+			victimID     int
+			crimeCode    int
+			weaponCode   int
+			premiseCode  int
+		)
+		if err := rows.Scan(&id, &dateReported, &dateOccurred, &timeOccurred, &locationID, &victimID, &crimeCode, &weaponCode, &premiseCode); err != nil {
+			return nil, err
+		}
+		crimeInfo = append(crimeInfo, CrimeInfo{
+			ID:           id,
+			DateReported: dateReported,
+			DateOccurred: dateOccurred,
+			TimeOccurred: timeOccurred,
+			LocationID:   locationID,
+			VictimID:     victimID,
+			CrimeCode:    crimeCode,
+			WeaponCode:   weaponCode,
+			PremiseCode:  premiseCode,
+		})
+	}
+	return crimeInfo, nil
+}

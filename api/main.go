@@ -20,8 +20,6 @@ func main() {
 	server := NewServer(":3000", *service, *r)
 
 	server.Router.Use(middleware.Logger)
-	server.Router.Route("/crimeInfo", func(r chi.Router) {
-		r.Get("/", HandleFuncCreator(server.listCrimeInfo))
-	})
+	server.Router.Mount("/", CrimeInfoRouter(*server))
 	http.ListenAndServe(":3000", &server.Router)
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -44,6 +45,15 @@ func (s *Server) listCrimeInfo(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func listCrimeInfoByDate(w http.ResponseWriter, r *http.Request) {
-
+func (s *Server) listCrimeInfoByDate(w http.ResponseWriter, r *http.Request) error {
+	ctx := context.Background()
+	date := r.URL.Query().Get("date")
+        fmt.Println(date)
+	info, err := s.DB.QueryCrimeInfoByDate(ctx, date)
+	if err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(info)
+	return nil
 }
